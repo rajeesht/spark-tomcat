@@ -4,50 +4,39 @@
 package com.rajeesht.playground.spark;
 
 import com.google.gson.Gson;
-import spark.Request;
-import spark.Response;
-import spark.Route;
 import spark.servlet.SparkApplication;
 
 import java.util.HashMap;
 
-import static spark.Spark.*;
+import static spark.Spark.get;
+import static spark.Spark.post;
 
 public class Main implements SparkApplication {
     public static void main(String[] args) {
-        System.out.println("Starting spark");
-
         Main service = new Main();
         service.init();
     }
 
     public void init() {
-        get("/hello", new Route() {
-            @Override
-            public Object handle(Request request, Response response) throws Exception {
-                return "hello world";
-            }
-        });
+        get("/hello", (req, res) -> "hello world");
 
-        post("/login", "application/json", new Route() {
-            @Override
-            public Object handle(Request request, Response response) throws Exception {
-                Gson gson = new Gson();
-                HashMap<String, String> status = new HashMap<String, String>();
-                User user = gson.fromJson(request.body(), User.class);
-                if (user.getUsername() == null || user.getUsername().isEmpty()) {
-                    status.put("status", "NoUsername");
+        post("/login", "application/json", (req, res) -> {
+                    Gson gson = new Gson();
+                    HashMap<String, String> status = new HashMap<>();
+                    User user = gson.fromJson(req.body(), User.class);
+                    if (user.getUsername() == null || user.getUsername().isEmpty()) {
+                        status.put("status", "NoUsername");
+                        return gson.toJson(status);
+                    }
+
+                    if (user.getPassword() == null || user.getPassword().isEmpty()) {
+                        status.put("status", "NoPassword");
+                        return gson.toJson(status);
+                    }
+                    status.put("status", "Ok");
                     return gson.toJson(status);
                 }
-
-                if (user.getPassword() == null || user.getPassword().isEmpty()) {
-                    status.put("status", "NoPassword");
-                    return gson.toJson(status);
-                }
-                status.put("status", "Ok");
-                return gson.toJson(status);
-            }
-        });
+        );
     }
 
     private class User {
