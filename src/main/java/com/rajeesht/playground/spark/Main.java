@@ -22,8 +22,6 @@ public class Main implements SparkApplication {
     }
 
     public void init() {
-        port(8081);
-
         get("/hello", new Route() {
             @Override
             public Object handle(Request request, Response response) throws Exception {
