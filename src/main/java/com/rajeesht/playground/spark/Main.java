@@ -24,6 +24,11 @@ public class Main implements SparkApplication {
                     Gson gson = new Gson();
                     HashMap<String, String> status = new HashMap<>();
                     User user = gson.fromJson(req.body(), User.class);
+                    if (user == null) {
+                        status.put("status", "InvalidRequest");
+                        return gson.toJson(status);
+                    }
+
                     if (user.getUsername() == null || user.getUsername().isEmpty()) {
                         status.put("status", "NoUsername");
                         return gson.toJson(status);
